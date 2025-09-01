@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Proxy Messages</title>
+    <link rel="stylesheet" href="{{ base_url }}/static/style.css">
+</head>
+<body>
+    <h1>Socket.IO Proxy Message Stream</h1>
+
+    <div class="controls">
+        <label>筛选事件:</label>
+        <div id="event-filter-container" class="custom-select-container">
+            <div id="selected-events" class="selected-events">
+                <span class="placeholder">选择事件...</span>
+            </div>
+            <div id="event-options" class="event-options">
+                <!-- Options will be populated by JavaScript -->
+            </div>
+        </div>
+        <button id="clear-event-filter">清除筛选</button>
+        <button id="clear-messages">清除消息</button>
+        <button id="restart-sio-button">重启连接</button>
+    </div>
+
+    <div class="main-content-container">
+        <div id="messages"></div>
+        <div class="message-input-container">
+            <div class="tab-container">
+                <button class="tab-link active" data-tab="builder-tab">快捷构建</button>
+                <button class="tab-link" data-tab="json-tab">原始JSON</button>
+            </div>
+
+            <div id="builder-tab" class="tab-content active">
+                <div class="builder-controls">
+                    <label for="message-builder-select">选择消息类型:</label>
+                    <select id="message-builder-select"></select>
+                </div>
+                <div id="builder-fields"></div>
+                <div class="preview-container">
+                    <label>实时预览:</label>
+                    <pre id="builder-preview"></pre>
+                </div>
+                <button id="send-builder-message-button">发送</button>
+            </div>
+
+            <div id="json-tab" class="tab-content">
+                <textarea id="message-input" placeholder="输入要发送的JSON消息..."></textarea>
+                <div class="message-actions">
+                    <button id="format-message-button">格式化</button>
+                    <button id="send-message-button">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.BASE_URL = "{{ base_url }}";
+    </script>
+    <script src="{{ base_url }}/static/message_builders.js"></script>
+    <script src="{{ base_url }}/static/message_formatters.js"></script>
+    <script src="{{ base_url }}/static/message_builder_ui.js"></script>
+    <script src="{{ base_url }}/static/main.js"></script>
+</body>
+</html>
