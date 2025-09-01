@@ -7,7 +7,7 @@
  * @param {object} message - 原始消息对象。
  * @returns {object} - 包含 compactContent 和 fullContent 的格式化消息。
  */
-function formatMessageForDisplay(message) {
+export function formatMessageForDisplay(message) {
     const eventType = message.event || 'unknown';
     const formatter = messageFormatters[eventType] || messageFormatters.default;
     return formatter(message);

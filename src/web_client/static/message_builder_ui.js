@@ -1,8 +1,10 @@
+import { messageBuilders } from './message_builders.js';
+
 // =================================================================
 // Message Builder UI Logic
 // =================================================================
 
-function initMessageBuilder(
+export function initMessageBuilder(
     messageBuilderSelect,
     builderFieldsDiv,
     sendBuilderMessageButton,

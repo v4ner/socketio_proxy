@@ -66,7 +66,7 @@ class ChatRoomChatBuilder extends MessageBuilder {
     }
 }
 
-const messageBuilders = {
+export const messageBuilders = {
     'AccountLogin': new AccountLoginBuilder(),
     'ChatRoomSearch': new ChatRoomSearchBuilder(),
     'ChatRoomJoin': new ChatRoomJoinBuilder(),
