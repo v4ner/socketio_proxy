@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 messageContainer.appendChild(eventTag);
 
                 const messageContentWrapper = document.createElement('div');
-                messageContentWrapper.className = 'flex-grow flex flex-wrap items-center';
+                messageContentWrapper.className = 'flex-grow flex-wrap items-center';
 
                 const compactContent = document.createElement('span');
                 compactContent.className = 'flex-grow whitespace-nowrap overflow-hidden text-ellipsis mr-1';
@@ -203,11 +203,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 toggleButton.className = 'bg-transparent border-none text-blue-500 cursor-pointer text-base p-0 px-1 flex-shrink-0 hover:text-blue-600';
                 toggleButton.textContent = '▼';
                 toggleButton.onclick = () => {
-                    fullContent.classList.toggle('block');
-                    toggleButton.textContent = fullContent.classList.contains('block') ? '▲' : '▼';
+                    if (fullContent.style.display === 'block') {
+                        fullContent.style.display = 'none';
+                        toggleButton.textContent = '▼';
+                    } else {
+                        fullContent.style.display = 'block';
+                        toggleButton.textContent = '▲';
+                    }
                 };
                 messageContentWrapper.appendChild(toggleButton);
-
                 const fullContent = document.createElement('pre');
                 fullContent.className = 'basis-full whitespace-pre-wrap break-all mt-1 p-1 bg-gray-50 rounded-sm hidden';
                 fullContent.textContent = message.fullContent;
