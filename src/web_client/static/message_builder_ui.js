@@ -26,9 +26,10 @@ function initMessageBuilder(
         const params = builder.params;
         Object.keys(params).forEach(key => {
             const fieldGroup = document.createElement('div');
-            fieldGroup.className = 'builder-field';
+            fieldGroup.className = 'mb-2';
 
             const label = document.createElement('label');
+            label.className = 'block text-sm font-medium text-gray-700';
             label.textContent = key;
             label.htmlFor = `builder-input-${key}`;
 
@@ -37,6 +38,7 @@ function initMessageBuilder(
             input.id = `builder-input-${key}`;
             input.name = key;
             input.value = params[key];
+            input.className = 'mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500';
 
             fieldGroup.appendChild(label);
             fieldGroup.appendChild(input);

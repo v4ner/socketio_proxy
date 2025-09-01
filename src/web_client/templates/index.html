@@ -4,52 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket.IO Proxy Messages</title>
-    <link rel="stylesheet" href="{{ base_url }}/static/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Socket.IO Proxy Message Stream</h1>
+<body class="h-screen flex flex-col p-5 bg-gray-100 text-gray-800 font-sans max-w-6xl mx-auto">
+    <h1 class="text-blue-700 mb-4 text-3xl font-bold">Socket.IO Proxy Message Stream</h1>
 
-    <div class="controls">
-        <label>筛选事件:</label>
-        <div id="event-filter-container" class="custom-select-container">
-            <div id="selected-events" class="selected-events">
-                <span class="placeholder">选择事件...</span>
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+        <label class="font-bold">筛选事件:</label>
+        <div id="event-filter-container" class="relative w-72 border border-gray-300 rounded-md cursor-pointer bg-white min-h-10 flex items-center flex-wrap p-1">
+            <div id="selected-events" class="flex flex-wrap gap-1 flex-grow">
+                <span class="text-gray-500 px-1">选择事件...</span>
             </div>
-            <div id="event-options" class="event-options">
+            <div id="event-options" class="absolute top-full left-0 right-0 border border-gray-300 border-t-0 rounded-b-md bg-white max-h-52 overflow-y-auto z-10 hidden">
                 <!-- Options will be populated by JavaScript -->
             </div>
         </div>
-        <button id="clear-event-filter">清除筛选</button>
-        <button id="clear-messages">清除消息</button>
-        <button id="restart-sio-button">重启连接</button>
+        <button id="clear-event-filter" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">清除筛选</button>
+        <button id="clear-messages" class="px-4 py-2 bg-red-500 text-white rounded-md cursor-pointer text-base hover:bg-red-600">清除消息</button>
+        <button id="restart-sio-button" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">重启连接</button>
     </div>
 
-    <div class="main-content-container">
-        <div id="messages"></div>
-        <div class="message-input-container">
-            <div class="tab-container">
-                <button class="tab-link active" data-tab="builder-tab">快捷构建</button>
-                <button class="tab-link" data-tab="json-tab">原始JSON</button>
+    <div class="flex flex-row gap-5 flex-grow h-[calc(100vh-150px)]">
+        <div id="messages" class="border border-gray-300 p-2 flex-grow-2 h-full overflow-y-scroll bg-white"></div>
+        <div class="flex flex-col gap-2 flex-grow h-full">
+            <div class="flex border-b border-gray-300 mb-2">
+                <button class="tab-link active bg-blue-500 border-blue-500 cursor-default font-bold text-white px-4 py-2 rounded-t-md mr-1" data-tab="builder-tab">快捷构建</button>
+                <button class="tab-link bg-gray-400 border border-gray-400 border-b-0 px-4 py-2 cursor-pointer transition-colors duration-300 rounded-t-md mr-1 text-gray-800 hover:bg-gray-500" data-tab="json-tab">原始JSON</button>
             </div>
 
-            <div id="builder-tab" class="tab-content active">
-                <div class="builder-controls">
-                    <label for="message-builder-select">选择消息类型:</label>
-                    <select id="message-builder-select"></select>
+            <div id="builder-tab" class="tab-content active p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto flex flex-col">
+                <div class="builder-controls mb-2">
+                    <label for="message-builder-select" class="block mb-1 font-bold">选择消息类型:</label>
+                    <select id="message-builder-select" class="w-full p-2 border border-gray-300 rounded-md"></select>
                 </div>
                 <div id="builder-fields"></div>
-                <div class="preview-container">
-                    <label>实时预览:</label>
-                    <pre id="builder-preview"></pre>
+                <div class="mt-4 flex flex-col flex-grow">
+                    <label class="block mb-1 font-bold text-gray-400">实时预览:</label>
+                    <pre id="builder-preview" class="bg-gray-800 border border-gray-700 rounded-md p-2 min-h-[100px] whitespace-pre-wrap break-words font-mono text-gray-300 text-sm flex-grow h-auto"></pre>
                 </div>
-                <button id="send-builder-message-button">发送</button>
+                <button id="send-builder-message-button" class="block w-full mt-2 h-10 flex-shrink-0 flex-grow-0 px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">发送</button>
             </div>
 
-            <div id="json-tab" class="tab-content">
-                <textarea id="message-input" placeholder="输入要发送的JSON消息..."></textarea>
-                <div class="message-actions">
-                    <button id="format-message-button">格式化</button>
-                    <button id="send-message-button">发送</button>
+            <div id="json-tab" class="tab-content hidden p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto">
+                <textarea id="message-input" placeholder="输入要发送的JSON消息..." class="flex-grow p-2 border border-gray-300 rounded-md font-mono text-sm resize-none min-h-[100px]"></textarea>
+                <div class="flex gap-2 w-full mt-2">
+                    <button id="format-message-button" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-blue-600">格式化</button>
+                    <button id="send-message-button" class="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-green-600">发送</button>
                 </div>
             </div>
         </div>

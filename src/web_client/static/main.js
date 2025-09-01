@@ -34,11 +34,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
         link.addEventListener('click', () => {
             const tabId = link.getAttribute('data-tab');
 
-            tabLinks.forEach(innerLink => innerLink.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
+            tabLinks.forEach(innerLink => {
+                // 移除激活状态的特定样式
+                innerLink.classList.remove('active', 'bg-blue-500', 'border-blue-500', 'cursor-default', 'font-bold', 'text-white');
+                // 添加非激活状态的特定样式
+                innerLink.classList.add('bg-gray-400', 'border-gray-400', 'border-b', 'text-gray-800', 'hover:bg-gray-500');
+            });
 
-            link.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            tabContents.forEach(content => {
+                content.classList.remove('flex', 'flex-col');
+                content.classList.add('hidden');
+            });
+
+            // 移除非激活状态的特定样式
+            link.classList.remove('bg-gray-400', 'border-gray-400', 'border-b', 'text-gray-800', 'hover:bg-gray-500');
+            // 为当前点击的 link 添加激活状态的特定样式
+            link.classList.add('active', 'bg-blue-500', 'border-blue-500', 'cursor-default', 'font-bold', 'text-white');
+
+            const activeTabContent = document.getElementById(tabId);
+            activeTabContent.classList.remove('hidden');
+            activeTabContent.classList.add('flex', 'flex-col');
         });
     });
 
@@ -115,14 +130,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function updateSelectedEventsDisplay() {
         selectedEventsDiv.innerHTML = '';
         if (selectedEvents.size === 0) {
-            selectedEventsDiv.innerHTML = '<span class="placeholder">选择事件...</span>';
+            selectedEventsDiv.innerHTML = '<span class="text-gray-500 px-1">选择事件...</span>';
         } else {
             selectedEvents.forEach(event => {
                 const tag = document.createElement('span');
-                tag.className = 'event-tag';
+                tag.className = 'bg-gray-200 px-2 py-1 rounded-sm flex items-center gap-1';
                 tag.textContent = event;
                 const removeBtn = document.createElement('span');
-                removeBtn.className = 'remove-tag';
+                removeBtn.className = 'cursor-pointer font-bold text-gray-600 hover:text-black';
                 removeBtn.textContent = 'x';
                 removeBtn.onclick = (e) => {
                     e.stopPropagation();
@@ -140,11 +155,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
         eventOptionsDiv.innerHTML = '';
         uniqueEvents.forEach(event => {
             const option = document.createElement('div');
-            option.className = 'event-option';
+            option.className = 'px-2 py-1 cursor-pointer hover:bg-gray-100';
             option.textContent = event;
             option.dataset.event = event;
             if (selectedEvents.has(event)) {
-                option.classList.add('selected');
+                option.classList.add('bg-blue-50', 'font-bold');
             }
             option.onclick = () => {
                 selectedEvents.has(event) ? selectedEvents.delete(event) : selectedEvents.add(event);
@@ -168,33 +183,33 @@ document.addEventListener('DOMContentLoaded', (event) => {
         allMessages.forEach(message => {
             if (selectedEvents.size === 0 || selectedEvents.has(message.tag)) {
                 const messageContainer = document.createElement('div');
-                messageContainer.className = 'message-item';
+                messageContainer.className = 'flex items-start my-1 p-1 bg-gray-200 rounded-sm font-mono text-sm';
                 messageContainer.dataset.event = message.tag;
 
                 const eventTag = document.createElement('span');
-                eventTag.className = 'message-event-tag';
+                eventTag.className = 'bg-blue-500 text-white px-2 py-1 rounded-sm mr-2 min-w-[80px] text-center flex-shrink-0';
                 eventTag.textContent = message.tag;
                 messageContainer.appendChild(eventTag);
 
                 const messageContentWrapper = document.createElement('div');
-                messageContentWrapper.className = 'message-content-wrapper';
+                messageContentWrapper.className = 'flex-grow flex flex-wrap items-center';
 
                 const compactContent = document.createElement('span');
-                compactContent.className = 'message-compact-content';
+                compactContent.className = 'flex-grow whitespace-nowrap overflow-hidden text-ellipsis mr-1';
                 compactContent.textContent = message.compactContent;
                 messageContentWrapper.appendChild(compactContent);
 
                 const toggleButton = document.createElement('button');
-                toggleButton.className = 'message-toggle-button';
+                toggleButton.className = 'bg-transparent border-none text-blue-500 cursor-pointer text-base p-0 px-1 flex-shrink-0 hover:text-blue-600';
                 toggleButton.textContent = '▼';
                 toggleButton.onclick = () => {
-                    fullContent.classList.toggle('show');
-                    toggleButton.textContent = fullContent.classList.contains('show') ? '▲' : '▼';
+                    fullContent.classList.toggle('block');
+                    toggleButton.textContent = fullContent.classList.contains('block') ? '▲' : '▼';
                 };
                 messageContentWrapper.appendChild(toggleButton);
 
                 const fullContent = document.createElement('pre');
-                fullContent.className = 'message-full-content';
+                fullContent.className = 'basis-full whitespace-pre-wrap break-all mt-1 p-1 bg-gray-50 rounded-sm hidden';
                 fullContent.textContent = message.fullContent;
                 messageContentWrapper.appendChild(fullContent);
 
