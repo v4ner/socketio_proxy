@@ -5,14 +5,14 @@ from ..web.websocket_manager import WebSocketManager
 from ..web import routes as api
 from ..config.logging import logger
 from ..config.settings import ProxyConfig
-from ..handlers.dispatch_handler import DispatchHandler
+from ..handlers.event_handler_manager import EventHandlerManager
 
 class SocketIOProxy:
     """
     A class to manage the lifecycle of the proxy server.
     """
 
-    def __init__(self, proxy_config: ProxyConfig, dispatch_handler: DispatchHandler):
+    def __init__(self, proxy_config: ProxyConfig, event_handler_manager: EventHandlerManager):
         logger.info(f"SocketIOProxy __init__ called with:")
         logger.info(f"  socketio_server_url: {proxy_config.socketio_server_url}")
         logger.info(f"  listen_host: {proxy_config.listen_host}")
@@ -21,11 +21,11 @@ class SocketIOProxy:
         logger.info(f"  headers: {proxy_config.headers}")
 
         self.proxy_config = proxy_config
-        self.dispatch_handler = dispatch_handler
-        self.websocket_manager = self.dispatch_handler.websocket_manager
+        self.event_handler_manager = event_handler_manager
+        self.websocket_manager = self.event_handler_manager.websocket_manager
 
         self.sio_client = SocketIOClient(
-            callback_handler=self.dispatch_handler.handle, headers=self.proxy_config.headers
+            callback_handler=self.event_handler_manager.handle, headers=self.proxy_config.headers
         )
         self.sio = self.sio_client.client
         self.http_client = self.sio_client.http_client_instance

@@ -1,16 +1,17 @@
 import { messageBuilders } from './message_builders.js';
+import { eventBus } from './event_bus.js';
 
-// =================================================================
-// Message Builder UI Logic
-// =================================================================
+export function initMessageBuilder(selectSelector, fieldsSelector, sendButtonSelector, previewSelector) {
+    const messageBuilderSelect = document.querySelector(selectSelector);
+    const builderFieldsDiv = document.querySelector(fieldsSelector);
+    const sendBuilderMessageButton = document.querySelector(sendButtonSelector);
+    const builderPreview = document.querySelector(previewSelector);
 
-export function initMessageBuilder(
-    messageBuilderSelect,
-    builderFieldsDiv,
-    sendBuilderMessageButton,
-    builderPreview,
-    sendMessage // Pass the sendMessage function from main.js
-) {
+    if (!messageBuilderSelect || !builderFieldsDiv || !sendBuilderMessageButton || !builderPreview) {
+        console.error('Message builder elements not found');
+        return;
+    }
+
     function populateBuilderSelect() {
         Object.keys(messageBuilders).forEach(name => {
             const option = document.createElement('option');
@@ -76,7 +77,7 @@ export function initMessageBuilder(
 
     messageBuilderSelect.addEventListener('change', (e) => {
         generateBuilderFields(e.target.value);
-        updateJsonPreview(); // Update preview on change
+        updateJsonPreview();
     });
 
     sendBuilderMessageButton.addEventListener('click', () => {
@@ -99,7 +100,7 @@ export function initMessageBuilder(
         });
 
         const message = builder.build(data);
-        sendMessage(message); // Use the passed-in function
+        eventBus.publish('ui:sendMessage', message);
     });
 
     // Initializations

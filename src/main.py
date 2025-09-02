@@ -6,9 +6,12 @@ import argparse
 from .core.proxy_server import SocketIOProxy
 from .config.settings import ConfigLoader
 from .config.logging import logger
-from .handlers.dispatch_handler import DispatchHandler
+from .handlers.event_handler_manager import EventHandlerManager
+from .handlers.event_preprocessors.manager import EventPreprocessorManager
+from .handlers.dispatchers.manager import DispatcherManager
 from .web.websocket_manager import WebSocketManager
 import httpx
+import os
 
 async def run_proxy_from_config(config_path: str):
     """
@@ -20,9 +23,25 @@ async def run_proxy_from_config(config_path: str):
     websocket_manager = WebSocketManager()
     http_client = httpx.AsyncClient()
 
-    dispatch_handler = DispatchHandler(config_loader.dispatch_config, http_client, websocket_manager)
+    # Define the directory and module path for event preprocessors
+    preprocessors_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'event_preprocessors')
+    base_module_path = 'src.handlers.event_preprocessors'
+    event_preprocessor_manager = EventPreprocessorManager(preprocessors_dir, base_module_path)
+
+    # Define the directory and module path for dispatchers
+    dispatchers_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'dispatchers')
+    dispatchers_base_module_path = 'src.handlers.dispatchers'
+    dispatcher_manager = DispatcherManager(dispatchers_dir, dispatchers_base_module_path)
+
+    event_handler_manager = EventHandlerManager(
+        config_loader.dispatch_config,
+        http_client,
+        websocket_manager,
+        event_preprocessor_manager,
+        dispatcher_manager
+    )
     
-    proxy = SocketIOProxy(config_loader.proxy_config, dispatch_handler)
+    proxy = SocketIOProxy(config_loader.proxy_config, event_handler_manager)
     
     try:
         await proxy.start()

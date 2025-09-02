@@ -1,4 +1,15 @@
-export function initJsonMessageSender(messageInput, sendMessageButton, formatMessageButton, sendMessage) {
+import { eventBus } from './event_bus.js';
+
+export function initJsonMessageSender(inputSelector, sendButtonSelector, formatButtonSelector) {
+    const messageInput = document.querySelector(inputSelector);
+    const sendMessageButton = document.querySelector(sendButtonSelector);
+    const formatMessageButton = document.querySelector(formatButtonSelector);
+
+    if (!messageInput || !sendMessageButton || !formatMessageButton) {
+        console.error('JSON message sender elements not found');
+        return;
+    }
+
     function sendJsonMessage() {
         const messageText = messageInput.value;
         if (!messageText.trim()) {
@@ -7,7 +18,7 @@ export function initJsonMessageSender(messageInput, sendMessageButton, formatMes
         }
         try {
             const parsedMessage = JSON.parse(messageText);
-            sendMessage(parsedMessage);
+            eventBus.publish('ui:sendMessage', parsedMessage);
             messageInput.value = ''; // Clear input after sending
         } catch (e) {
             alert('无效的JSON格式。请检查您的消息。');

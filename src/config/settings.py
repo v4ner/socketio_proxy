@@ -1,7 +1,7 @@
 import yaml
 import os
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 @dataclass
 class ProxyConfig:
@@ -12,8 +12,14 @@ class ProxyConfig:
     headers: Dict[str, str]
 
 @dataclass
+class DispatchRule:
+    schema: Dict[str, Any]
+    dispatchers: List[Dict[str, Any]]
+    event_preprocessor: Optional[str] = None # New field for event preprocessor
+
+@dataclass
 class DispatchConfig:
-    rules: List[Dict[str, Any]] = field(default_factory=list)
+    rules: List[DispatchRule] = field(default_factory=list)
 
 class ConfigLoader:
     def __init__(self, config_path=None):
@@ -35,6 +41,12 @@ class ConfigLoader:
             self.proxy_config.base_url = '/' + self.proxy_config.base_url
 
         dispatch_config_data = config.get('dispatch', {})
-        self.dispatch_config = DispatchConfig(
-            rules=dispatch_config_data.get("rules", [])
-        )
+        rules_data = dispatch_config_data.get("rules", [])
+        parsed_rules = []
+        for rule_data in rules_data:
+            parsed_rules.append(DispatchRule(
+                schema=rule_data['schema'],
+                dispatchers=rule_data['dispatchers'],
+                event_preprocessor=rule_data.get('event_preprocessor')
+            ))
+        self.dispatch_config = DispatchConfig(rules=parsed_rules)
