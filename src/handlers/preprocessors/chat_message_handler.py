@@ -1,3 +1,4 @@
+from typing import Optional
 from .base import BasePreprocessor
 from src.config.logging import logger
 
