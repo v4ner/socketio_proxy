@@ -24,6 +24,10 @@ class EventHandler:
             # Schema matched, proceed with preprocessing and dispatching
             logger.info(f"Event matched schema. Applying preprocessor '{self.preprocessor.name}'...")
             processed_data = self.preprocessor.preprocess(event, data)
+            if processed_data is None:
+                logger.info(f"Preprocessor '{self.preprocessor.name}' intercepted event '{event}'. Message dropped.")
+                return True # Event was handled (intercepted)
+
             final_json_obj = {"event": event, "data": processed_data}
 
             message_summary = json.dumps(final_json_obj)
