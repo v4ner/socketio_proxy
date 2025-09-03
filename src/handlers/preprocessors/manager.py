@@ -1,4 +1,5 @@
 import sys
+import inspect
 from typing import Dict, Any
 from src.config.logging import logger
 from src.util.reflect_manager import ReflectionManager
@@ -10,13 +11,11 @@ class PreprocessorManager(ReflectionManager[BasePreprocessor]):
         self.items[base_preprocessor.name] = base_preprocessor
 
     def _register_from_module(self, module: Any):
-        for attribute_name in dir(module):
-            attribute = getattr(module, attribute_name)
-            if isinstance(attribute, BasePreprocessor):
-                if attribute.name in self.items:
-                    logger.warning(f"Dup preprocessor '{attribute.name}'. Overwriting.")
-                self.items[attribute.name] = attribute
-                logger.info(f"Preprocessor '{attribute.name}' loaded.")
+        for name, instance in inspect.getmembers(module, lambda obj: isinstance(obj, BasePreprocessor)):
+            if instance.name in self.items:
+                logger.warning(f"Dup preprocessor '{instance.name}'. Overwriting.")
+            self.items[instance.name] = instance
+            logger.info(f"Preprocessor '{name}' (instance name: '{instance.name}') loaded.")
 
     def get_preprocessor(self, name: str) -> BasePreprocessor:
         preprocessor = self.get_item(name)
