@@ -14,8 +14,6 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
     app = FastAPI()
     router = APIRouter(prefix=base_url)
 
-    sio = sio_client.client # Assign sio_client.client to sio for existing code compatibility
-
     templates = Jinja2Templates(directory="src/web_client/templates")
     app.mount(base_url + "/static", StaticFiles(directory="src/web_client/static"), name="static")
 
