@@ -20,8 +20,8 @@ function tagMessage(message) {
  */
 function processAndStoreMessage(message) {
     const taggedMessage = tagMessage(message);
-    const formattedMessage = formatMessageForDisplay(taggedMessage);
-    store.addMessage({ ...taggedMessage, ...formattedMessage });
+    // Formatting should happen at display time, not before storing.
+    store.addMessage(taggedMessage);
 }
 
 /**

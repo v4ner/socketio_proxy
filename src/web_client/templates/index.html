@@ -1,55 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket.IO Debug</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="h-screen flex flex-col p-5 bg-gray-100 text-gray-800 font-sans max-w-6xl mx-auto">
     <h1 class="text-blue-700 mb-4 text-3xl font-bold">Socket.IO Proxy Message Stream</h1>
 
-    <div class="flex items-center gap-2 mb-4 flex-wrap">
+    <div class="flex items-center gap-2 mb-4 flex-wrap" x-data="{
+            showOptions: false,
+            uniqueEvents: [],
+            selectedEvents: new Set(),
+
+            init() {
+                this.uniqueEvents = Array.from(window.store.getState().uniqueEvents);
+                this.selectedEvents = new Set(window.store.getState().selectedEvents);
+
+                window.eventBus.subscribe('state:changed', (state) => {
+                    this.uniqueEvents = Array.from(state.uniqueEvents);
+                    this.selectedEvents = new Set(state.selectedEvents);
+                });
+
+                // 点击外部关闭下拉菜单
+                document.addEventListener('click', (e) => {
+                    if (!this.$el.contains(e.target)) {
+                        this.showOptions = false;
+                    }
+                });
+            },
+
+            toggleOption(event) {
+                const newSelected = new Set(this.selectedEvents);
+                if (newSelected.has(event)) {
+                    newSelected.delete(event);
+                } else {
+                    newSelected.add(event);
+                }
+                window.store.updateSelectedEvents(newSelected);
+            },
+
+            clearFilter() {
+                window.store.updateSelectedEvents(new Set());
+            }
+        }">
         <label class="font-bold">筛选事件:</label>
-        <div id="event-filter-container" class="relative w-72 border border-gray-300 rounded-md cursor-pointer bg-white min-h-10 flex items-center flex-wrap p-1">
+        <div id="event-filter-container"
+            class="relative w-72 border border-gray-300 rounded-md cursor-pointer bg-white min-h-10 flex items-center flex-wrap p-1"
+            @click="showOptions = !showOptions">
             <div id="selected-events" class="flex flex-wrap gap-1 flex-grow">
-                <span class="text-gray-500 px-1">选择事件...</span>
+                <template x-if="selectedEvents.size === 0">
+                    <span class="text-gray-500 px-1">选择事件...</span>
+                </template>
+                <template x-for="event in Array.from(selectedEvents)" :key="event">
+                    <span class="bg-gray-200 px-2 py-1 rounded-sm flex items-center gap-1">
+                        <span x-text="event"></span>
+                        <span class="cursor-pointer font-bold text-gray-600 hover:text-black"
+                            @click.stop="toggleOption(event)">x</span>
+                    </span>
+                </template>
             </div>
-            <div id="event-options" class="absolute top-full left-0 right-0 border border-gray-300 border-t-0 rounded-b-md bg-white max-h-52 overflow-y-auto z-10 hidden">
-                <!-- Options will be populated by JavaScript -->
+            <div id="event-options"
+                class="absolute top-full left-0 right-0 border border-gray-300 border-t-0 rounded-b-md bg-white max-h-52 overflow-y-auto z-10"
+                :class="{ 'hidden': !showOptions }">
+                <template x-for="event in uniqueEvents" :key="event">
+                    <div class="px-2 py-1 cursor-pointer hover:bg-gray-100"
+                        :class="{ 'bg-blue-50 font-bold': selectedEvents.has(event) }" @click.stop="toggleOption(event)"
+                        x-text="event"></div>
+                </template>
             </div>
         </div>
-        <button id="clear-event-filter" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">清除筛选</button>
-        <button id="clear-messages" class="px-4 py-2 bg-red-500 text-white rounded-md cursor-pointer text-base hover:bg-red-600">清除消息</button>
-        <button id="restart-sio-button" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">重启连接</button>
+        <button id="clear-event-filter"
+            class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600"
+            @click="clearFilter()">清除筛选</button>
+        <button id="clear-messages"
+            class="px-4 py-2 bg-red-500 text-white rounded-md cursor-pointer text-base hover:bg-red-600">清除消息</button>
+        <button id="restart-sio-button"
+            class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">重启连接</button>
     </div>
 
     <div class="flex flex-row gap-5 flex-grow h-[calc(100vh-150px)] overflow-hidden">
-        <div id="messages" class="border border-gray-300 p-2 w-2/3 h-full overflow-y-scroll bg-white"></div>
-        <div class="flex flex-col gap-2 w-1/3 h-full">
+        <div id="messages" class="border border-gray-300 p-2 w-2/3 h-full overflow-y-scroll bg-white" x-data="{
+                allMessages: [],
+                filteredMessages: [],
+                selectedEvents: new Set(),
+
+                init() {
+                    this.allMessages = window.store.getState().messages.map(msg => ({ ...msg, showFull: false }));
+                    this.selectedEvents = new Set(window.store.getState().selectedEvents);
+                    this.filterMessages();
+
+                    window.eventBus.subscribe('state:changed', (state) => {
+                        this.allMessages = state.messages.map(msg => ({ ...msg, showFull: false }));
+                        this.selectedEvents = new Set(state.selectedEvents);
+                        this.filterMessages();
+                        this.$nextTick(() => {
+                            this.$el.scrollTop = this.$el.scrollHeight;
+                        });
+                    });
+                },
+
+                filterMessages() {
+                    if (this.selectedEvents.size === 0) {
+                        this.filteredMessages = this.allMessages;
+                    } else {
+                        this.filteredMessages = this.allMessages.filter(message => this.selectedEvents.has(message.tag));
+                    }
+                },
+
+                clearMessages() {
+                    window.eventBus.publish('ui:clearMessages');
+                }
+            }">
+            <template x-for="(message, index) in filteredMessages" :key="index">
+                <div class="flex items-start my-1 p-1 bg-gray-200 rounded-sm font-mono text-sm"
+                    :data-event="message.tag">
+                    <span
+                        class="bg-blue-500 text-white px-2 py-1 rounded-sm mr-2 min-w-[80px] text-center flex-shrink-0"
+                        x-text="message.tag"></span>
+                    <div class="flex-grow flex-wrap items-center">
+                        <span class="flex-grow whitespace-pre-wrap break-words overflow-hidden text-ellipsis mr-1"
+                            x-text="window.formatMessageForDisplay(message).compactContent"></span>
+                        <button
+                            class="bg-transparent border-none text-blue-500 cursor-pointer text-base p-0 px-1 flex-shrink-0 hover:text-blue-600"
+                            @click="message.showFull = !message.showFull"
+                            x-text="message.showFull ? '▲' : '▼'"></button>
+                        <pre class="basis-full whitespace-pre-wrap break-all mt-1 p-1 bg-gray-50 rounded-sm"
+                            x-show="message.showFull"
+                            x-text="window.formatMessageForDisplay(message).fullContent"></pre>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <div class="flex flex-col gap-2 w-1/3 h-full" x-data="{ activeTab: 'builder-tab' }">
             <div class="flex border-b border-gray-300 mb-2">
-                <button class="tab-link active bg-blue-500 border-blue-500 cursor-default font-bold text-white px-4 py-2 rounded-t-md mr-1" data-tab="builder-tab">快捷构建</button>
-                <button class="tab-link bg-gray-400 border border-gray-400 border-b-0 px-4 py-2 cursor-pointer transition-colors duration-300 rounded-t-md mr-1 text-gray-800 hover:bg-gray-500" data-tab="json-tab">原始JSON</button>
+                <button @click="activeTab = 'builder-tab'"
+                    class="px-4 py-2 rounded-t-md mr-1 transition-colors duration-300 border-b-0" :class="{
+                        'bg-blue-500 border-blue-500 text-white font-bold cursor-default': activeTab === 'builder-tab',
+                        'bg-gray-400 border-gray-400 text-gray-800 hover:bg-gray-500 cursor-pointer': activeTab !== 'builder-tab'
+                    }">快捷构建</button>
+                <button @click="activeTab = 'json-tab'"
+                    class="px-4 py-2 rounded-t-md mr-1 transition-colors duration-300 border-b-0" :class="{
+                        'bg-blue-500 border-blue-500 text-white font-bold cursor-default': activeTab === 'json-tab',
+                        'bg-gray-400 border-gray-400 text-gray-800 hover:bg-gray-500 cursor-pointer': activeTab !== 'json-tab'
+                    }">原始JSON</button>
             </div>
 
-            <div id="builder-tab" class="tab-content active p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto flex flex-col">
+            <div id="builder-tab" x-show="activeTab === 'builder-tab'"
+                class="tab-content p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto flex flex-col"
+                x-data="{
+                    messageBuilders: window.messageBuilders,
+                    selectedBuilderName: 'AccountLogin',
+                    fieldValues: {},
+                    jsonPreview: '',
+
+                    init() {
+                        this.selectedBuilderName = Object.keys(this.messageBuilders)[0];
+                        this.updateFieldValues();
+                        this.$watch('selectedBuilderName', () => this.updateFieldValues());
+                        this.$watch('fieldValues', () => this.updateJsonPreview(), { deep: true });
+                    },
+
+                    updateFieldValues() {
+                        const builder = this.messageBuilders[this.selectedBuilderName];
+                        if (builder) {
+                            this.fieldValues = { ...builder.params };
+                        } else {
+                            this.fieldValues = {};
+                        }
+                        this.updateJsonPreview();
+                    },
+
+                    updateJsonPreview() {
+                        const builder = this.messageBuilders[this.selectedBuilderName];
+                        if (!builder) {
+                            this.jsonPreview = '';
+                            return;
+                        }
+
+                        const data = {};
+                        for (const key in this.fieldValues) {
+                            let value = this.fieldValues[key];
+                            if (typeof value === 'string') {
+                                if (value.toLowerCase() === 'true') {
+                                    value = true;
+                                } else if (value.toLowerCase() === 'false') {
+                                    value = false;
+                                } else if (key !== 'Password' && !isNaN(value) && value.trim() !== '') {
+                                    value = Number(value);
+                                }
+                            }
+                            data[key] = value;
+                        }
+                        this.jsonPreview = JSON.stringify(builder.build(data), null, 2);
+                    },
+
+                    sendMessage() {
+                        const builder = this.messageBuilders[this.selectedBuilderName];
+                        if (!builder) return;
+
+                        const data = {};
+                        for (const key in this.fieldValues) {
+                            let value = this.fieldValues[key];
+                            if (typeof value === 'string') {
+                                if (value.toLowerCase() === 'true') {
+                                    value = true;
+                                } else if (value.toLowerCase() === 'false') {
+                                    value = false;
+                                } else if (key !== 'Password' && !isNaN(value) && value.trim() !== '') {
+                                    value = Number(value);
+                                }
+                            }
+                            data[key] = value;
+                        }
+                        window.eventBus.publish('ui:sendMessage', builder.build(data));
+                    }
+                }">
                 <div class="builder-controls mb-2">
                     <label for="message-builder-select" class="block mb-1 font-bold">选择消息类型:</label>
-                    <select id="message-builder-select" class="w-full p-2 border border-gray-300 rounded-md"></select>
+                    <select id="message-builder-select" class="w-full p-2 border border-gray-300 rounded-md"
+                        x-model="selectedBuilderName">
+                        <template x-for="(builder, name) in messageBuilders" :key="name">
+                            <option :value="name" x-text="name"></option>
+                        </template>
+                    </select>
                 </div>
-                <div id="builder-fields"></div>
+                <div id="builder-fields">
+                    <template x-for="(value, key) in fieldValues" :key="key">
+                        <div class="mb-2">
+                            <label class="block text-sm font-medium text-gray-700" :for="`builder-input-${key}`"
+                                x-text="key"></label>
+                            <input type="text" :id="`builder-input-${key}`" :name="key" x-model="fieldValues[key]"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </template>
+                </div>
                 <div class="mt-4 flex flex-col flex-grow">
                     <label class="block mb-1 font-bold text-gray-400">实时预览:</label>
-                    <pre id="builder-preview" class="bg-gray-800 border border-gray-700 rounded-md p-2 min-h-[100px] whitespace-pre-wrap break-words font-mono text-gray-300 text-sm flex-grow h-auto"></pre>
+                    <pre id="builder-preview"
+                        class="bg-gray-800 border border-gray-700 rounded-md p-2 min-h-[100px] whitespace-pre-wrap break-words font-mono text-gray-300 text-sm flex-grow h-auto"
+                        x-text="jsonPreview"></pre>
                 </div>
-                <button id="send-builder-message-button" class="block w-full mt-2 h-10 flex-shrink-0 flex-grow-0 px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600">发送</button>
+                <button id="send-builder-message-button"
+                    class="block w-full mt-2 h-10 flex-shrink-0 flex-grow-0 px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base hover:bg-blue-600"
+                    @click="sendMessage()">发送</button>
             </div>
 
-            <div id="json-tab" class="tab-content hidden p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto">
-                <textarea id="message-input" placeholder="输入要发送的JSON消息..." class="flex-grow p-2 border border-gray-300 rounded-md font-mono text-sm resize-none min-h-[100px]"></textarea>
-                <div class="flex gap-2 w-full mt-2">
-                    <button id="format-message-button" class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-blue-600">格式化</button>
-                    <button id="send-message-button" class="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-green-600">发送</button>
+            <div id="json-tab" x-show="activeTab === 'json-tab'"
+                class="tab-content p-4 border border-gray-300 border-t-0 bg-white flex-grow overflow-y-auto flex flex-col"
+                x-data="{
+                    messageInput: '',
+
+                    sendJsonMessage() {
+                        if (!this.messageInput.trim()) {
+                            alert('消息内容不能为空！');
+                            return;
+                        }
+                        try {
+                            const parsedMessage = JSON.parse(this.messageInput);
+                            window.eventBus.publish('ui:sendMessage', parsedMessage);
+                            this.messageInput = ''; // Clear input after sending
+                        } catch (e) {
+                            alert('无效的JSON格式。请检查您的消息。');
+                            console.error('消息发送错误:', e);
+                        }
+                    },
+
+                    formatJsonMessage() {
+                        if (!this.messageInput.trim()) return;
+                        try {
+                            const parsed = JSON.parse(this.messageInput);
+                            this.messageInput = JSON.stringify(parsed, null, 2);
+                        } catch (e) {
+                            alert('无效的JSON格式，无法格式化。');
+                        }
+                    }
+                }">
+                <textarea id="message-input" placeholder="输入要发送的JSON消息..."
+                    class="flex-grow p-2 border border-gray-300 rounded-md font-mono text-sm resize-none"
+                    x-model="messageInput"></textarea>
+                <div class="flex gap-2 w-full mt-2 flex-shrink-0">
+                    <button id="format-message-button"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-blue-600"
+                        @click="formatJsonMessage()">格式化</button>
+                    <button id="send-message-button"
+                        class="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer text-base flex-shrink-0 flex-grow hover:bg-green-600"
+                        @click="sendJsonMessage()">发送</button>
                 </div>
             </div>
         </div>
@@ -59,5 +298,7 @@
         window.BASE_URL = "{{ base_url }}";
     </script>
     <script type="module" src="{{ base_url }}/static/main.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
+
 </html>
