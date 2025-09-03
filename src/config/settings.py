@@ -56,7 +56,6 @@ class ConfigLoader:
             ))
         self.dispatch_config = DispatchConfig(rules=parsed_rules)
 
-        # 新增: 加载 extend 配置
         extend_config_data = config.get('extend', {})
         self.extend_config = ExtendConfig(
             preprocessors=extend_config_data.get('preprocessors', []),

@@ -12,6 +12,7 @@ from .handlers.dispatchers.manager import DispatcherManager
 from .web.websocket_manager import WebSocketManager
 from .web.route_manager import RouteManager
 from .core.socketio_client import SocketIOClient
+from .web.dependencies import app_context  # 导入 app_context
 import httpx
 import os
 
@@ -56,19 +57,19 @@ async def run_proxy_from_config(config_path: str):
         headers=config_loader.proxy_config.headers
     )
 
+    # 注册共享实例到 app_context
+    app_context.set_sio_client(sio_client)
+    app_context.set_websocket_manager(websocket_manager)
+
     if config_loader.extend_config.routes:
-        context = {
-            "sio_client": sio_client,
-            "websocket_manager": websocket_manager,
-        }
-        route_manager.load_routes_from_paths(config_loader.extend_config.routes, context)
+        route_manager.load_from_paths(config_loader.extend_config.routes)
     
     # 将加载的路由传递给 Proxy
     proxy = SocketIOProxy(
         config_loader.proxy_config,
         event_handler_manager,
         sio_client,
-        external_routers=route_manager.routers
+        external_routers=list(route_manager.items.values())
     )
     
     try:

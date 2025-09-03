@@ -10,5 +10,5 @@ class BcEventPreprocessor(BasePreprocessor):
         data["X-Processed-By"] = self.name
         return data
 
-# 必须实例化
+
 bc_event_preprocessor = BcEventPreprocessor()
