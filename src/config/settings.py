@@ -1,7 +1,12 @@
 import yaml
 import os
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Type
+
+@dataclass
+class ExtendConfig:
+    preprocessors: List[str] = field(default_factory=list)
+    routes: List[str] = field(default_factory=list)
 
 @dataclass
 class ProxyConfig:
@@ -50,3 +55,10 @@ class ConfigLoader:
                 preprocessor=rule_data.get('preprocessor')
             ))
         self.dispatch_config = DispatchConfig(rules=parsed_rules)
+
+        # 新增: 加载 extend 配置
+        extend_config_data = config.get('extend', {})
+        self.extend_config = ExtendConfig(
+            preprocessors=extend_config_data.get('preprocessors', []),
+            routes=extend_config_data.get('routes', [])
+        )

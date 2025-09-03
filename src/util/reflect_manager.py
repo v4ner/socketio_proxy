@@ -2,7 +2,7 @@ import os
 import importlib.util
 import sys
 from abc import ABC, abstractmethod
-from typing import Dict, TypeVar, Generic, Any
+from typing import Dict, TypeVar, Generic, Any, List
 from src.config.logging import logger
 
 # 定义一个类型变量，用于泛型，可以是任何类型
@@ -18,7 +18,45 @@ class ReflectionManager(ABC, Generic[T]):
         self.target_dir = target_dir
         self.base_module_path = base_module_path
         self.item_name = item_name # e.g., "preprocessor", "dispatcher"
-        self._load_items()
+        self._load_items_from_dir(self.target_dir) # 重命名内部加载方法
+
+    def _load_items_from_dir(self, directory): # 这是重命名后的 _load_items
+        if not os.path.exists(directory):
+            logger.warning(f"{self.item_name.capitalize()} dir not found: {directory}")
+            return
+
+        for filename in os.listdir(directory):
+            if filename.endswith(".py") and filename not in ("__init__.py", "base.py", "manager.py", "reflect_manager.py"):
+                file_path = os.path.join(directory, filename)
+                self.load_module_from_path(file_path)
+
+    def load_module_from_path(self, file_path: str, is_external: bool = False):
+        """从给定的文件路径加载单个模块并注册其内容。"""
+        module_name = os.path.splitext(os.path.basename(file_path))[0]
+        
+        if is_external:
+            # 创建一个对于外部模块唯一的模块路径
+            full_module_path = f"external.{self.item_name}.{module_name}"
+        else:
+            full_module_path = f"{self.base_module_path}.{module_name}"
+
+        try:
+            spec = importlib.util.spec_from_file_location(full_module_path, file_path)
+            if spec and spec.loader:
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[full_module_path] = module
+                spec.loader.exec_module(module)
+                self._register_from_module(module)
+        except Exception as e:
+            logger.error(f"Load {self.item_name} fail '{file_path}': {e}")
+
+    def load_from_paths(self, paths: List[str]):
+        """从一个文件路径列表加载模块。"""
+        for path in paths:
+            if os.path.exists(path):
+                self.load_module_from_path(path, is_external=True)
+            else:
+                logger.warning(f"Path not found for {self.item_name}: {path}")
 
     def _load_items(self):
         if not os.path.exists(self.target_dir):

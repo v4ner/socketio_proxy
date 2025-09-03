@@ -10,6 +10,8 @@ from .handlers.event_handler_manager import EventHandlerManager
 from .handlers.preprocessors.manager import PreprocessorManager
 from .handlers.dispatchers.manager import DispatcherManager
 from .web.websocket_manager import WebSocketManager
+from .web.route_manager import RouteManager
+from .core.socketio_client import SocketIOClient
 import httpx
 import os
 
@@ -27,12 +29,20 @@ async def run_proxy_from_config(config_path: str):
     preprocessors_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'preprocessors')
     base_module_path = 'src.handlers.preprocessors'
     preprocessor_manager = PreprocessorManager(preprocessors_dir, base_module_path)
-
+ 
     # Define the directory and module path for dispatchers
     dispatchers_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'dispatchers')
     dispatchers_base_module_path = 'src.handlers.dispatchers'
     dispatcher_manager = DispatcherManager(dispatchers_dir, dispatchers_base_module_path)
 
+    # 新增: 加载外部模块
+    # 1. 加载外部 preprocessors
+    if config_loader.extend_config.preprocessors:
+        preprocessor_manager.load_from_paths(config_loader.extend_config.preprocessors)
+
+    # 2. 加载外部 routes
+    route_manager = RouteManager()
+    
     event_handler_manager = EventHandlerManager(
         config_loader.dispatch_config,
         http_client,
@@ -40,8 +50,26 @@ async def run_proxy_from_config(config_path: str):
         preprocessor_manager,
         dispatcher_manager
     )
+
+    sio_client = SocketIOClient(
+        callback_handler=event_handler_manager.handle,
+        headers=config_loader.proxy_config.headers
+    )
+
+    if config_loader.extend_config.routes:
+        context = {
+            "sio_client": sio_client,
+            "websocket_manager": websocket_manager,
+        }
+        route_manager.load_routes_from_paths(config_loader.extend_config.routes, context)
     
-    proxy = SocketIOProxy(config_loader.proxy_config, event_handler_manager)
+    # 将加载的路由传递给 Proxy
+    proxy = SocketIOProxy(
+        config_loader.proxy_config,
+        event_handler_manager,
+        sio_client,
+        external_routers=route_manager.routers
+    )
     
     try:
         await proxy.start()

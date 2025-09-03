@@ -6,26 +6,26 @@ from src.web import routes as api
 from src.config.logging import logger
 from src.config.settings import ProxyConfig
 from src.handlers.event_handler_manager import EventHandlerManager
+from typing import List
+from fastapi import APIRouter
 
 class SocketIOProxy:
     """
     A class to manage the lifecycle of the proxy server.
     """
 
-    def __init__(self, proxy_config: ProxyConfig, event_handler_manager: EventHandlerManager):
+    def __init__(self, proxy_config: ProxyConfig, event_handler_manager: EventHandlerManager, sio_client: SocketIOClient, external_routers: List[APIRouter] = None):
         logger.info(f"Proxy init. SIO URL: {proxy_config.socketio_server_url}, Listen: {proxy_config.listen_host}:{proxy_config.listen_port}, Base URL: {proxy_config.base_url}, Headers: {proxy_config.headers}")
 
         self.proxy_config = proxy_config
         self.event_handler_manager = event_handler_manager
         self.websocket_manager = self.event_handler_manager.websocket_manager
-
-        self.sio_client = SocketIOClient(
-            callback_handler=self.event_handler_manager.handle, headers=self.proxy_config.headers
-        )
+        self.sio_client = sio_client
         self.sio = self.sio_client.client
         self.http_client = self.sio_client.http_client_instance
+        self.external_routers = external_routers if external_routers else []
         self.app = api.create_app(
-            self.sio_client, self.proxy_config.base_url, self.websocket_manager
+            self.sio_client, self.proxy_config.base_url, self.websocket_manager, self.external_routers
         )
 
         self.server = None

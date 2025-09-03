@@ -7,10 +7,11 @@ from fastapi.templating import Jinja2Templates
 import socketio
 import json
 from src.config.logging import logger
+from typing import List
 
 from src.core.socketio_client import SocketIOClient # Import SocketIOClient
-
-def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager=None):
+ 
+def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager=None, external_routers: List[APIRouter] = None):
     app = FastAPI()
     router = APIRouter(prefix=base_url)
 
@@ -69,4 +70,10 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
         return {"status": "ok", "message": "Request logged"}
 
     app.include_router(router)
+
+    # 新增: 包含外部路由
+    if external_routers:
+        for external_router in external_routers:
+            app.include_router(external_router, prefix=base_url)
+
     return app
