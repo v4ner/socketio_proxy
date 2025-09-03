@@ -1,8 +1,8 @@
-from .base import BaseEventPreprocessor
+from .base import BasePreprocessor
 from src.config.logging import logger
 
-# Create an instance of BaseEventPreprocessor
-chat_preprocessor = BaseEventPreprocessor("chat_message_preprocessor")
+# Create an instance of BasePreprocessor
+chat_preprocessor = BasePreprocessor("chat_message_preprocessor")
 
 @chat_preprocessor.on("ChatRoomMessage")
 def preprocess_chat_room_message(data: dict) -> dict:

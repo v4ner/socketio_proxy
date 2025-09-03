@@ -1,6 +1,6 @@
 from typing import Callable, Dict, Any
 
-class BaseEventPreprocessor:
+class BasePreprocessor:
     """
     Base class for event preprocessors.
     Each preprocessor instance has a name and can register multiple preprocessor functions
@@ -32,4 +32,4 @@ class BaseEventPreprocessor:
         return data
 
 # Default event preprocessor that does not modify any events
-base_event_preprocessor = BaseEventPreprocessor("base_event_preprocessor")
+base_preprocessor = BasePreprocessor("base_preprocessor")

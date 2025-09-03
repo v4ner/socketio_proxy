@@ -7,7 +7,7 @@ from .core.proxy_server import SocketIOProxy
 from .config.settings import ConfigLoader
 from .config.logging import logger
 from .handlers.event_handler_manager import EventHandlerManager
-from .handlers.event_preprocessors.manager import EventPreprocessorManager
+from .handlers.preprocessors.manager import PreprocessorManager
 from .handlers.dispatchers.manager import DispatcherManager
 from .web.websocket_manager import WebSocketManager
 import httpx
@@ -24,9 +24,9 @@ async def run_proxy_from_config(config_path: str):
     http_client = httpx.AsyncClient()
 
     # Define the directory and module path for event preprocessors
-    preprocessors_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'event_preprocessors')
-    base_module_path = 'src.handlers.event_preprocessors'
-    event_preprocessor_manager = EventPreprocessorManager(preprocessors_dir, base_module_path)
+    preprocessors_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'preprocessors')
+    base_module_path = 'src.handlers.preprocessors'
+    preprocessor_manager = PreprocessorManager(preprocessors_dir, base_module_path)
 
     # Define the directory and module path for dispatchers
     dispatchers_dir = os.path.join(os.path.dirname(__file__), 'handlers', 'dispatchers')
@@ -37,7 +37,7 @@ async def run_proxy_from_config(config_path: str):
         config_loader.dispatch_config,
         http_client,
         websocket_manager,
-        event_preprocessor_manager,
+        preprocessor_manager,
         dispatcher_manager
     )
     

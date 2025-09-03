@@ -1,15 +1,15 @@
 from jsonschema import validate, ValidationError
 from typing import List, Dict, Any
 from .dispatchers.base import Dispatcher
-from .event_preprocessors.base import BaseEventPreprocessor
+from .preprocessors.base import BasePreprocessor
 from ..config.logging import logger
 import json
 import asyncio
 
 class EventHandler:
-    def __init__(self, schema: Dict[str, Any], event_preprocessor: BaseEventPreprocessor, dispatchers: List[Dispatcher]):
+    def __init__(self, schema: Dict[str, Any], preprocessor: BasePreprocessor, dispatchers: List[Dispatcher]):
         self.schema = schema
-        self.event_preprocessor = event_preprocessor
+        self.preprocessor = preprocessor
         self.dispatchers = dispatchers
 
     async def handle(self, event: str, data: Any) -> bool:
@@ -22,8 +22,8 @@ class EventHandler:
             validate(instance=json_obj, schema=self.schema)
             
             # Schema matched, proceed with preprocessing and dispatching
-            logger.info(f"Event matched schema. Applying preprocessor '{self.event_preprocessor.name}'...")
-            processed_data = self.event_preprocessor.preprocess(event, data)
+            logger.info(f"Event matched schema. Applying preprocessor '{self.preprocessor.name}'...")
+            processed_data = self.preprocessor.preprocess(event, data)
             final_json_obj = {"event": event, "data": processed_data}
 
             message_summary = json.dumps(final_json_obj)

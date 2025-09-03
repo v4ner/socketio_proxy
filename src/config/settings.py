@@ -15,7 +15,7 @@ class ProxyConfig:
 class DispatchRule:
     schema: Dict[str, Any]
     dispatchers: List[Dict[str, Any]]
-    event_preprocessor: Optional[str] = None # New field for event preprocessor
+    preprocessor: Optional[str] = None # New field for event preprocessor
 
 @dataclass
 class DispatchConfig:
@@ -47,6 +47,6 @@ class ConfigLoader:
             parsed_rules.append(DispatchRule(
                 schema=rule_data['schema'],
                 dispatchers=rule_data['dispatchers'],
-                event_preprocessor=rule_data.get('event_preprocessor')
+                preprocessor=rule_data.get('preprocessor')
             ))
         self.dispatch_config = DispatchConfig(rules=parsed_rules)

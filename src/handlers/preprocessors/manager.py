@@ -3,16 +3,16 @@ import sys
 import os
 from typing import Dict
 from ...config.logging import logger
-from .base import BaseEventPreprocessor, base_event_preprocessor
+from .base import BasePreprocessor, base_preprocessor
 
-class EventPreprocessorManager:
+class PreprocessorManager:
     """
-    Manages the loading and retrieval of EventPreprocessor instances.
-    Scans a specified directory for EventPreprocessor modules and registers them.
+    Manages the loading and retrieval of Preprocessor instances.
+    Scans a specified directory for Preprocessor modules and registers them.
     """
     def __init__(self, preprocessors_dir: str, base_module_path: str):
-        self.preprocessors: Dict[str, BaseEventPreprocessor] = {
-            base_event_preprocessor.name: base_event_preprocessor
+        self.preprocessors: Dict[str, BasePreprocessor] = {
+            base_preprocessor.name: base_preprocessor
         }
         self.preprocessors_dir = preprocessors_dir
         self.base_module_path = base_module_path
@@ -38,7 +38,7 @@ class EventPreprocessorManager:
                         
                         for attribute_name in dir(module):
                             attribute = getattr(module, attribute_name)
-                            if isinstance(attribute, BaseEventPreprocessor):
+                            if isinstance(attribute, BasePreprocessor):
                                 if attribute.name in self.preprocessors:
                                     logger.warning(f"Duplicate event preprocessor name '{attribute.name}' found. Overwriting.")
                                 self.preprocessors[attribute.name] = attribute
@@ -46,13 +46,13 @@ class EventPreprocessorManager:
                 except Exception as e:
                     logger.error(f"Error loading event preprocessor from {file_path}: {e}")
 
-    def get_preprocessor(self, name: str) -> BaseEventPreprocessor:
+    def get_preprocessor(self, name: str) -> BasePreprocessor:
         """
-        Retrieves an EventPreprocessor instance by its name.
-        Returns the base_event_preprocessor if the named preprocessor is not found.
+        Retrieves an Preprocessor instance by its name.
+        Returns the base_preprocessor if the named preprocessor is not found.
         """
         preprocessor = self.preprocessors.get(name)
         if not preprocessor:
-            logger.warning(f"Event preprocessor '{name}' not found. Using base_event_preprocessor.")
-            return self.preprocessors[base_event_preprocessor.name]
+            logger.warning(f"Event preprocessor '{name}' not found. Using base_preprocessor.")
+            return self.preprocessors[base_preprocessor.name]
         return preprocessor
