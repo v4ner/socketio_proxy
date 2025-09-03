@@ -39,7 +39,7 @@ class EventHandlerManager:
             
             handler = EventHandler(rule_config.schema, preprocessor, dispatchers)
             self.event_handlers.append(handler)
-            logger.info(f"Rule {i+1} loaded into an EventHandler with preprocessor '{preprocessor.name}' and dispatchers: {', '.join(dispatcher_types)}.")
+            logger.info(f"Rule {i+1} loaded. Preprocessor: '{preprocessor.name}', Dispatchers: {', '.join(dispatcher_types)}.")
 
     async def handle(self, event: str, data: Any):
         for handler in self.event_handlers:
@@ -51,5 +51,5 @@ class EventHandlerManager:
         message_summary = json.dumps(original_json_obj)
         if len(message_summary) > 100:
             message_summary = message_summary[:100] + "..."
-        logger.info(f"No matching rule found. Using default dispatcher. Message summary: {message_summary}")
+        logger.info(f"No matched schema, msg={message_summary}")
         await self.default_dispatcher.dispatch(original_json_obj)

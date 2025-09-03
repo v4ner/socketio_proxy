@@ -30,7 +30,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
             while True:
                 await websocket.receive_text()
         except Exception as e:
-            logger.error(f"WebSocket disconnected: {e}")
+            logger.error(f"WS disconnected: {e}")
         finally:
             websocket_manager.disconnect(websocket)
 
@@ -57,7 +57,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
         """
         Restarts the Socket.IO client connection.
         """
-        logger.info("Received request to restart Socket.IO connection.")
+        logger.info("Restart SIO conn request.")
         await sio_client.restart()
         return {"status": "ok", "message": "Socket.IO connection restarted."}
 
@@ -67,7 +67,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
         A test endpoint that logs the request body and returns a status.
         """
         body = await request.json()
-        logger.info(f"Received test request with body: {body}")
+        logger.info(f"Test request. Body: {body}")
         return {"status": "ok", "message": "Request logged"}
 
     app.include_router(router)

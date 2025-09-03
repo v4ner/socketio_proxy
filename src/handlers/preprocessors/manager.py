@@ -20,7 +20,7 @@ class PreprocessorManager:
 
     def _load_preprocessors(self):
         if not os.path.exists(self.preprocessors_dir):
-            logger.warning(f"Event preprocessors directory not found: {self.preprocessors_dir}")
+            logger.warning(f"Preprocessor dir not found: {self.preprocessors_dir}")
             return
 
         for filename in os.listdir(self.preprocessors_dir):
@@ -40,11 +40,11 @@ class PreprocessorManager:
                             attribute = getattr(module, attribute_name)
                             if isinstance(attribute, BasePreprocessor):
                                 if attribute.name in self.preprocessors:
-                                    logger.warning(f"Duplicate event preprocessor name '{attribute.name}' found. Overwriting.")
+                                    logger.warning(f"Dup preprocessor '{attribute.name}'. Overwriting.")
                                 self.preprocessors[attribute.name] = attribute
-                                logger.info(f"Loaded event preprocessor: {attribute.name}")
+                                logger.info(f"Preprocessor '{attribute.name}' loaded.")
                 except Exception as e:
-                    logger.error(f"Error loading event preprocessor from {file_path}: {e}")
+                    logger.error(f"Load preprocessor fail '{file_path}': {e}")
 
     def get_preprocessor(self, name: str) -> BasePreprocessor:
         """
@@ -53,6 +53,6 @@ class PreprocessorManager:
         """
         preprocessor = self.preprocessors.get(name)
         if not preprocessor:
-            logger.warning(f"Event preprocessor '{name}' not found. Using base_preprocessor.")
+            logger.warning(f"Preprocessor '{name}' not found. Using base.")
             return self.preprocessors[base_preprocessor.name]
         return preprocessor

@@ -46,7 +46,7 @@ async def run_proxy_from_config(config_path: str):
     try:
         await proxy.start()
     except (KeyboardInterrupt, asyncio.CancelledError):
-        logger.info("Shutting down proxy...")
+        logger.info("Proxy shutting down...")
     finally:
         await proxy.stop()
         await http_client.aclose() # Ensure http_client is closed
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Proxy terminated by user.")
+        logger.info("Proxy terminated.")

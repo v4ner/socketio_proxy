@@ -20,11 +20,11 @@ class DispatcherManager:
                     for name, obj in inspect.getmembers(module, inspect.isclass):
                         if issubclass(obj, Dispatcher) and obj is not Dispatcher:
                             if obj.type in self.dispatchers:
-                                logger.warning(f"Duplicate dispatcher type '{obj.type}' found. Overwriting.")
+                                logger.warning(f"Dup dispatcher type '{obj.type}'. Overwriting.")
                             self.dispatchers[obj.type] = obj
-                            logger.info(f"Discovered and registered dispatcher: {name} with type '{obj.type}'")
+                            logger.info(f"Dispatcher '{name}' registered (type: '{obj.type}').")
                 except ImportError as e:
-                    logger.error(f"Failed to import dispatcher module {module_path}: {e}")
+                    logger.error(f"Import dispatcher fail '{module_path}': {e}")
 
     def get_dispatcher(self, config: dict, **kwargs) -> Dispatcher:
         dispatcher_type = config.get("type")

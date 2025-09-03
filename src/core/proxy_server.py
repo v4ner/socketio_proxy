@@ -13,12 +13,7 @@ class SocketIOProxy:
     """
 
     def __init__(self, proxy_config: ProxyConfig, event_handler_manager: EventHandlerManager):
-        logger.info(f"SocketIOProxy __init__ called with:")
-        logger.info(f"  socketio_server_url: {proxy_config.socketio_server_url}")
-        logger.info(f"  listen_host: {proxy_config.listen_host}")
-        logger.info(f"  listen_port: {proxy_config.listen_port}")
-        logger.info(f"  base_url: {proxy_config.base_url}")
-        logger.info(f"  headers: {proxy_config.headers}")
+        logger.info(f"Proxy init. SIO URL: {proxy_config.socketio_server_url}, Listen: {proxy_config.listen_host}:{proxy_config.listen_port}, Base URL: {proxy_config.base_url}, Headers: {proxy_config.headers}")
 
         self.proxy_config = proxy_config
         self.event_handler_manager = event_handler_manager
@@ -46,9 +41,7 @@ class SocketIOProxy:
         )
         self.server = uvicorn.Server(server_config)
 
-        logger.info(
-            f"Proxy starting. HTTP interface listening on http://{self.proxy_config.listen_host}:{self.proxy_config.listen_port}"
-        )
+        logger.info(f"Proxy starting. HTTP listening on http://{self.proxy_config.listen_host}:{self.proxy_config.listen_port}")
 
         self.sio_task = asyncio.create_task(
             self.sio_client.start(self.proxy_config.socketio_server_url)

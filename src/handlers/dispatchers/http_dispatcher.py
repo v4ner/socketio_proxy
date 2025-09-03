@@ -13,7 +13,7 @@ class HttpDispatcher(Dispatcher):
         try:
             await self.http_client.post(self.callback_url, json=message)
         except httpx.RequestError as e:
-            logger.error(f"Error forwarding event to callback URL: {e}")
+            logger.error(f"HTTP dispatch error to {self.callback_url}: {e}")
 
     @classmethod
     def from_config(cls, config: dict, **kwargs):
