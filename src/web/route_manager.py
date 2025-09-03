@@ -5,14 +5,13 @@ import inspect
 from typing import List, Dict, Any, Type
 from fastapi import APIRouter
 from src.config.logging import logger
-from src.util.reflect_manager import ReflectionManager
+from src.util.reflection_manager import ReflectionManager
 
 class RouteManager(ReflectionManager[APIRouter]):
     def __init__(self, route_dir: str = "", base_module_path: str = "src.web.routes"):
         super().__init__(route_dir, base_module_path, "route")
 
     def _register_from_module(self, module: Any):
-        # 检查并调用初始化函数
         if hasattr(module, "initialize_plugin"):
             try:
                 module.initialize_plugin()
@@ -20,7 +19,6 @@ class RouteManager(ReflectionManager[APIRouter]):
             except Exception as e:
                 logger.error(f"Failed to initialize plugin in '{module.__name__}': {e}")
         
-        # 注册 APIRouter 实例
         for name, member in inspect.getmembers(module, lambda obj: isinstance(obj, APIRouter)):
             self.items[name] = member
             logger.info(f"Loaded external router '{name}' from module '{module.__name__}'.")

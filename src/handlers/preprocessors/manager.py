@@ -2,7 +2,7 @@ import sys
 import inspect
 from typing import Dict, Any
 from src.config.logging import logger
-from src.util.reflect_manager import ReflectionManager
+from src.util.reflection_manager import ReflectionManager
 from .base import BasePreprocessor, base_preprocessor
 
 class PreprocessorManager(ReflectionManager[BasePreprocessor]):

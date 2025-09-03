@@ -1,7 +1,7 @@
 import inspect
 from typing import Dict, Type, Any
 from src.config.logging import logger
-from src.util.reflect_manager import ReflectionManager
+from src.util.reflection_manager import ReflectionManager
 from .base import Dispatcher
 
 class DispatcherManager(ReflectionManager[Type[Dispatcher]]):

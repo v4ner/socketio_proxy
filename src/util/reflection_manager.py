@@ -21,23 +21,21 @@ class ReflectionManager(ABC, Generic[T]):
         self._load_items_from_dir(self.target_dir)
 
     def _load_items_from_dir(self, directory):
-        if not directory: # Add this check for empty directory string
+        if not directory:
             return
         if not os.path.exists(directory):
             logger.warning(f"{self.item_name.capitalize()} dir not found: {directory}")
             return
 
         for filename in os.listdir(directory):
-            if filename.endswith(".py") and filename not in ("__init__.py", "base.py", "manager.py", "reflect_manager.py"):
+            if filename.endswith(".py") and filename not in ("__init__.py", "base.py", "manager.py", "reflection_manager.py"):
                 file_path = os.path.join(directory, filename)
                 self.load_module_from_path(file_path)
 
     def load_module_from_path(self, file_path: str, is_external: bool = False):
-        """从给定的文件路径加载单个模块并注册其内容。"""
         module_name = os.path.splitext(os.path.basename(file_path))[0]
         
         if is_external:
-            # 创建一个对于外部模块唯一的模块路径
             full_module_path = f"external.{self.item_name}.{module_name}"
         else:
             full_module_path = f"{self.base_module_path}.{module_name}"
@@ -49,17 +47,13 @@ class ReflectionManager(ABC, Generic[T]):
                 sys.modules[full_module_path] = module
                 spec.loader.exec_module(module)
                 self._register_from_module(module)
-                logger.info(f"Successfully loaded {self.item_name} module: '{full_module_path}'")
         except Exception as e:
             logger.error(f"Failed to load {self.item_name} module from '{file_path}' as '{full_module_path}': {e}")
 
     def load_from_paths(self, paths: List[str]):
-        """从一个文件路径列表加载模块。"""
         for path in paths:
             if os.path.exists(path):
                 self.load_module_from_path(path, is_external=True)
-            else:
-                logger.warning(f"Path not found for {self.item_name}: {path}")
 
     @abstractmethod
     def _register_from_module(self, module: Any):

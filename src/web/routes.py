@@ -9,7 +9,7 @@ import json
 from src.config.logging import logger
 from typing import List
 
-from src.core.socketio_client import SocketIOClient # Import SocketIOClient
+from src.core.socketio_client import SocketIOClient
  
 def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager=None, external_routers: List[APIRouter] = None):
     app = FastAPI()
@@ -38,7 +38,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
         """
         Receives a message via HTTP POST and emits it to the Socket.IO server.
         """
-        if not sio_client.client.connected: # Use sio_client.client here
+        if not sio_client.client.connected:
             raise HTTPException(status_code=503, detail="Socket.IO client is not connected.")
 
         try:
@@ -48,7 +48,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
         except (KeyError, TypeError):
             raise HTTPException(status_code=400, detail="Invalid request format. Required JSON: {'event': str, 'data': dict}")
 
-        await sio_client.client.emit(event, data) # Use sio_client.client here
+        await sio_client.client.emit(event, data)
         return {"status": "ok"}
 
     @router.post("/restart_sio")
@@ -71,7 +71,7 @@ def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager
 
     app.include_router(router)
 
-    # 新增: 包含外部路由
+    # register extend routers
     if external_routers:
         for external_router in external_routers:
             app.include_router(external_router, prefix=base_url)
