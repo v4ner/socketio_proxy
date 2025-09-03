@@ -2,7 +2,7 @@ import importlib.util
 import sys
 import os
 from typing import Dict
-from ...config.logging import logger
+from src.config.logging import logger
 from .base import BasePreprocessor, base_preprocessor
 
 class PreprocessorManager:

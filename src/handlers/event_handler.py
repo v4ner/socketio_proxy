@@ -2,7 +2,7 @@ from jsonschema import validate, ValidationError
 from typing import List, Dict, Any
 from .dispatchers.base import Dispatcher
 from .preprocessors.base import BasePreprocessor
-from ..config.logging import logger
+from src.config.logging import logger
 import json
 import asyncio
 

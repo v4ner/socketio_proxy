@@ -6,9 +6,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import socketio
 import json
-from ..config.logging import logger
+from src.config.logging import logger
 
-from ..core.socketio_client import SocketIOClient # Import SocketIOClient
+from src.core.socketio_client import SocketIOClient # Import SocketIOClient
 
 def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager=None):
     app = FastAPI()

@@ -1,11 +1,11 @@
 import asyncio
 import uvicorn
 from .socketio_client import SocketIOClient
-from ..web.websocket_manager import WebSocketManager
-from ..web import routes as api
-from ..config.logging import logger
-from ..config.settings import ProxyConfig
-from ..handlers.event_handler_manager import EventHandlerManager
+from src.web.websocket_manager import WebSocketManager
+from src.web import routes as api
+from src.config.logging import logger
+from src.config.settings import ProxyConfig
+from src.handlers.event_handler_manager import EventHandlerManager
 
 class SocketIOProxy:
     """

@@ -1,6 +1,6 @@
 import json
 from .base import Dispatcher
-from ...web.websocket_manager import WebSocketManager
+from src.web.websocket_manager import WebSocketManager
 
 class WebSocketDispatcher(Dispatcher):
     type = "websocket"

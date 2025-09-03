@@ -2,7 +2,7 @@ import os
 import importlib
 import inspect
 from typing import Dict, Type
-from ...config.logging import logger
+from src.config.logging import logger
 from .base import Dispatcher
 
 class DispatcherManager:

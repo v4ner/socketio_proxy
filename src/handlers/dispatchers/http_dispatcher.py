@@ -1,6 +1,6 @@
 import httpx
 from .base import Dispatcher
-from ...config.logging import logger
+from src.config.logging import logger
 
 class HttpDispatcher(Dispatcher):
     type = "http"

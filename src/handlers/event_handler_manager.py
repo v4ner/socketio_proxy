@@ -1,12 +1,12 @@
 from typing import List, Any
 import httpx
-from ..config.settings import DispatchConfig
-from ..web.websocket_manager import WebSocketManager
+from src.config.settings import DispatchConfig
+from src.web.websocket_manager import WebSocketManager
 from .preprocessors.manager import PreprocessorManager
 from .event_handler import EventHandler
 from .dispatchers.manager import DispatcherManager
 from .dispatchers.base import Dispatcher
-from ..config.logging import logger
+from src.config.logging import logger
 import json
 
 class EventHandlerManager:
