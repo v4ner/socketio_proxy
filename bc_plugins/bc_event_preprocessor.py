@@ -1,14 +1,10 @@
 from src.handlers.preprocessors.base import BasePreprocessor
 
-class BcEventPreprocessor(BasePreprocessor):
-    def __init__(self):
-        super().__init__("bc_event_preprocessor")
-        self.on("ChatRoomMessage")(self.process_chat_message)
+# 创建 BasePreprocessor 的实例
+bc_event_preprocessor = BasePreprocessor("bc_event_preprocessor")
 
-    def process_chat_message(self, data: dict) -> dict:
-        # 示例逻辑：给事件数据添加一个字段
-        data["X-Processed-By"] = self.name
-        return data
-
-
-bc_event_preprocessor = BcEventPreprocessor()
+@bc_event_preprocessor.on("ChatRoomMessage")
+def process_chat_message(data: dict) -> dict:
+    # 示例逻辑：给事件数据添加一个字段
+    data["X-Processed-By"] = bc_event_preprocessor.name
+    return data
