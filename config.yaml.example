@@ -44,7 +44,7 @@ dispatch:
 extend:
   # (可选) 自定义预处理器列表
   preprocessors:
-    - "bc_plugins/bc_event_preprocessor.py"
+    - "example_plugins/example_event_preprocessor.py"
     # (可选) 自定义路由列表
   routes:
-    - "bc_plugins/bc_http_api.py"
+    - "example_plugins/example_http_api.py"

@@ -6,7 +6,7 @@ from src.config.logging import logger
 chat_preprocessor = BasePreprocessor("chat_message_preprocessor")
 
 @chat_preprocessor.on("ChatRoomMessage")
-def preprocess_chat_room_message(data: dict) -> Optional[dict]:
+async def preprocess_chat_room_message(data: dict) -> Optional[dict]:
     """
     Example preprocessor for 'ChatRoomMessage' event.
     It removes the 'Sender' and 'Target' fields from the data.
