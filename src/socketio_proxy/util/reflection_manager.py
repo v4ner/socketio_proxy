@@ -3,7 +3,7 @@ import importlib.util
 import sys
 from abc import ABC, abstractmethod
 from typing import Dict, TypeVar, Generic, Any, List
-from src.config.logging import logger
+from socketio_proxy.config.logging import logger
 
 # 定义一个类型变量，用于泛型，可以是任何类型
 T = TypeVar('T')

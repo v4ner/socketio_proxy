@@ -1,6 +1,6 @@
 import json
-from .base import Dispatcher
-from src.web.websocket_manager import WebSocketManager
+from socketio_proxy.handlers.dispatchers.base import Dispatcher
+from socketio_proxy.web.websocket_manager import WebSocketManager
 
 class WebSocketDispatcher(Dispatcher):
     type = "websocket"

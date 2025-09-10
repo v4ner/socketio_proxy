@@ -3,16 +3,16 @@ import argparse
 import os
 import httpx
 
-from ..core.proxy_server import SocketIOProxy
-from ..config.settings import ConfigLoader
-from ..config.logging import logger
-from ..handlers.event_handler_manager import EventHandlerManager
-from ..handlers.preprocessors.manager import PreprocessorManager
-from ..handlers.dispatchers.manager import DispatcherManager
-from ..web.websocket_manager import WebSocketManager
-from ..web.route_manager import RouteManager
-from ..core.socketio_client import SocketIOClient
-from ..web.dependencies import app_context
+from socketio_proxy.core.proxy_server import SocketIOProxy
+from socketio_proxy.config.settings import ConfigLoader
+from socketio_proxy.config.logging import logger
+from socketio_proxy.handlers.event_handler_manager import EventHandlerManager
+from socketio_proxy.handlers.preprocessors.manager import PreprocessorManager
+from socketio_proxy.handlers.dispatchers.manager import DispatcherManager
+from socketio_proxy.web.websocket_manager import WebSocketManager
+from socketio_proxy.web.route_manager import RouteManager
+from socketio_proxy.core.socketio_client import SocketIOClient
+from socketio_proxy.web.dependencies import app_context
 
 class SocketIOProxyBuilder:
     def __init__(self, config_path: str):
@@ -24,7 +24,7 @@ class SocketIOProxyBuilder:
 
     def _build_preprocessor_manager(self) -> PreprocessorManager:
         preprocessors_dir = os.path.join(os.path.dirname(__file__), '..', 'handlers', 'preprocessors')
-        base_module_path = 'src.handlers.preprocessors'
+        base_module_path = 'src.socketio_proxy.handlers.preprocessors'
         manager = PreprocessorManager(preprocessors_dir, base_module_path)
         if self.config_loader.extend_config.preprocessors:
             manager.load_from_paths(self.config_loader.extend_config.preprocessors)
@@ -32,7 +32,7 @@ class SocketIOProxyBuilder:
 
     def _build_dispatcher_manager(self) -> DispatcherManager:
         dispatchers_dir = os.path.join(os.path.dirname(__file__), '..', 'handlers', 'dispatchers')
-        dispatchers_base_module_path = 'src.handlers.dispatchers'
+        dispatchers_base_module_path = 'src.socketio_proxy.handlers.dispatchers'
         manager = DispatcherManager(dispatchers_dir, dispatchers_base_module_path)
         return manager
 

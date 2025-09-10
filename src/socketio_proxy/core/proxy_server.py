@@ -1,11 +1,11 @@
 import asyncio
 import uvicorn
-from .socketio_client import SocketIOClient
-from src.web.websocket_manager import WebSocketManager
-from src.web import routes as api
-from src.config.logging import logger
-from src.config.settings import ProxyConfig
-from src.handlers.event_handler_manager import EventHandlerManager
+from socketio_proxy.core.socketio_client import SocketIOClient
+from socketio_proxy.web.websocket_manager import WebSocketManager
+from socketio_proxy.web import routes as api
+from socketio_proxy.config.logging import logger
+from socketio_proxy.config.settings import ProxyConfig
+from socketio_proxy.handlers.event_handler_manager import EventHandlerManager
 from typing import List
 from fastapi import APIRouter
 

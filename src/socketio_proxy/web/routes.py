@@ -6,17 +6,28 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import socketio
 import json
-from src.config.logging import logger
+from socketio_proxy.config.logging import logger
 from typing import List
 
-from src.core.socketio_client import SocketIOClient
+from socketio_proxy.core.socketio_client import SocketIOClient
+
+import importlib.resources
+
+try:
+    resources_path = importlib.resources.files('socketio_proxy.web_client')
+except (ImportError, AttributeError):
+    from importlib_resources import files
+    resources_path = files('socketio_proxy.web_client')
+
+templates_dir = resources_path / 'templates'
+static_dir = resources_path / 'static'
  
 def create_app(sio_client: SocketIOClient, base_url: str = "", websocket_manager=None, external_routers: List[APIRouter] = None):
     app = FastAPI()
     router = APIRouter(prefix=base_url)
 
-    templates = Jinja2Templates(directory="src/web_client/templates")
-    app.mount(base_url + "/static", StaticFiles(directory="src/web_client/static"), name="static")
+    templates = Jinja2Templates(directory=templates_dir)
+    app.mount(base_url + "/static", StaticFiles(directory=static_dir), name="static")
 
     @router.get("/")
     async def read_root(request: Request):

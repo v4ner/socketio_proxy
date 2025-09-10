@@ -6,8 +6,8 @@ instances of services like the SocketIOClient, WebSocketManager, etc.,
 which are primarily used by the web routes and plugins.
 """
 from typing import Optional, Dict, Any
-from src.core.socketio_client import SocketIOClient
-from src.web.websocket_manager import WebSocketManager
+from socketio_proxy.core.socketio_client import SocketIOClient
+from socketio_proxy.web.websocket_manager import WebSocketManager
 
 class AppContext:
     """

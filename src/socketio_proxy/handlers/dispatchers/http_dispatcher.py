@@ -1,6 +1,6 @@
 import httpx
-from .base import Dispatcher
-from src.config.logging import logger
+from socketio_proxy.handlers.dispatchers.base import Dispatcher
+from socketio_proxy.config.logging import logger
 
 class HttpDispatcher(Dispatcher):
     type = "http"

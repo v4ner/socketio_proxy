@@ -1,6 +1,6 @@
 import aiofiles
 import json
-from .base import Dispatcher
+from socketio_proxy.handlers.dispatchers.base import Dispatcher
 
 class FileDispatcher(Dispatcher):
     type = "file"

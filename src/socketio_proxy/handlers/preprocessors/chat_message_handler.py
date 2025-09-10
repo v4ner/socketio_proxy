@@ -1,6 +1,6 @@
 from typing import Optional
-from .base import BasePreprocessor
-from src.config.logging import logger
+from socketio_proxy.handlers.preprocessors.base import BasePreprocessor
+from socketio_proxy.config.logging import logger
 
 # Create an instance of BasePreprocessor
 chat_preprocessor = BasePreprocessor("chat_message_preprocessor")

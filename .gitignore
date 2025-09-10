@@ -5,3 +5,4 @@ config.yaml
 tests/
 *.ipynb
 TODO
+*.egg-info

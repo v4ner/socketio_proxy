@@ -1,8 +1,8 @@
 import inspect
 from typing import Dict, Type, Any
-from src.config.logging import logger
-from src.util.reflection_manager import ReflectionManager
-from .base import Dispatcher
+from socketio_proxy.config.logging import logger
+from socketio_proxy.util.reflection_manager import ReflectionManager
+from socketio_proxy.handlers.dispatchers.base import Dispatcher
 
 class DispatcherManager(ReflectionManager[Type[Dispatcher]]):
     def __init__(self, dispatchers_dir: str, base_module_path: str):

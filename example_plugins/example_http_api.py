@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends
-from src.config.logging import logger
-from src.core.socketio_client import SocketIOClient
-from src.web.dependencies import app_context
+from socketio_proxy.config.logging import logger
+from socketio_proxy.core.socketio_client import SocketIOClient
+from socketio_proxy.web.dependencies import app_context
 
 router = APIRouter()
 

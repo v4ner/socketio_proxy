@@ -4,7 +4,7 @@ Handles the Socket.IO client and its events.
 import socketio
 import httpx
 import json
-from src.config.logging import logger
+from socketio_proxy.config.logging import logger
 
 class SocketIOClient:
     """

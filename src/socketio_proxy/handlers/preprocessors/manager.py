@@ -1,9 +1,9 @@
 import sys
 import inspect
 from typing import Dict, Any
-from src.config.logging import logger
-from src.util.reflection_manager import ReflectionManager
-from .base import BasePreprocessor, base_preprocessor
+from socketio_proxy.config.logging import logger
+from socketio_proxy.util.reflection_manager import ReflectionManager
+from socketio_proxy.handlers.preprocessors.base import BasePreprocessor, base_preprocessor
 
 class PreprocessorManager(ReflectionManager[BasePreprocessor]):
     def __init__(self, preprocessors_dir: str, base_module_path: str):

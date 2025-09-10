@@ -1,8 +1,8 @@
 from jsonschema import validate, ValidationError
 from typing import List, Dict, Any
-from .dispatchers.base import Dispatcher
-from .preprocessors.base import BasePreprocessor
-from src.config.logging import logger
+from socketio_proxy.handlers.dispatchers.base import Dispatcher
+from socketio_proxy.handlers.preprocessors.base import BasePreprocessor
+from socketio_proxy.config.logging import logger
 import json
 import asyncio
 

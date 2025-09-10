@@ -6,4 +6,6 @@
 # Run the proxy with the configuration file.
 # The -m flag tells Python to run the module as a script.
 echo "Starting Socket.IO proxy with config.yaml..."
-python3 -m src.main --config config.yaml
+
+pip install -e .
+socketio-proxy --config config.yaml

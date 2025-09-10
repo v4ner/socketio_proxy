@@ -38,7 +38,7 @@
     ```
     或者，您可以直接运行 Python 模块：
     ```bash
-    python3 -m src.main --config config.yaml
+    python3 -m src.socketio_proxy.main --config config.yaml
     ```
 
 ## 配置
@@ -95,13 +95,13 @@
 
 事件预处理器允许您在事件分发之前对其进行修改。
 
-1.  创建一个继承自 `src.handlers.preprocessors.base.BasePreprocessor` 的新 Python 文件。
+1.  创建一个继承自 `src.socketio_proxy.handlers.preprocessors.base.BasePreprocessor` 的新 Python 文件。
 2.  使用 `@your_preprocessor.on("event_name")` 装饰器为特定事件注册处理函数。
 3.  在 `config.yaml` 的 `extend.preprocessors` 部分添加您的预处理器模块的路径。
 
 **示例 (`plugins/my_preprocessor.py`):**
 ```python
-from src.handlers.preprocessors.base import BasePreprocessor
+from socketio_proxy.handlers.preprocessors.base import BasePreprocessor
 
 my_preprocessor = BasePreprocessor("my_preprocessor")
 

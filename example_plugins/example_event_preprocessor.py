@@ -1,4 +1,4 @@
-from src.handlers.preprocessors.base import BasePreprocessor
+from socketio_proxy.handlers.preprocessors.base import BasePreprocessor
 
 # 创建 BasePreprocessor 的实例
 example_event_preprocessor = BasePreprocessor("example_event_preprocessor")

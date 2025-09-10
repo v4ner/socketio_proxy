@@ -1,3 +1,52 @@
+# pyproject.toml
+
+# 这一部分是必须的，它告诉 pip 等工具如何构建你的项目
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "socketio-proxy"
+
+version = "0.1.0"
+
+authors = [
+  { name="v4ner", email="v4ner@proton.me" },
+]
+
+description = "A proxy for socket.io events."
+
+readme = "README.md"
+
+requires-python = ">=3.6"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "python-socketio",
+    "httpx",
+    "pyyaml",
+    "jsonschema",
+    "aiofiles"
+]
+
+[project.scripts]
+socketio-proxy = "socketio_proxy.main:main"
+
+[project.urls]
+"Homepage" = "https://github.com/v4ner/socketio_proxy"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"socketio_proxy.web_client" = [
+    "static/**/*",
+    "templates/**/*",
+]
